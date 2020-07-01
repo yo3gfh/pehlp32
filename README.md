@@ -2,7 +2,7 @@
 
 **PEHLP32, a PE (portable executable) helper library v. 1.1**
 
-Copyright (c) 2020 Adrian Petrila, YO3GFH
+Copyright (c) 2020 Adrian Petrila, YO3GFH<br>
 Original code "imported" with small changes from PEDump utility,
 (c) 1994-2001 Matt Pietrek.
 
