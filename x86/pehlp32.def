@@ -1,0 +1,18 @@
+LIBRARY	pehlp32
+EXPORTS	PE_OpenModule
+		PE_CloseModule
+		PE_RVAToPtr
+		PE_GetSectionHeader
+		PE_FindSection
+		PE_EnumImports
+		PE_EnumExports
+		PE_EnumSections
+		PE_EnumCharacteristics
+		PE_GetMachineType
+		PE_GetFileHeader
+		PE_GetOptionalHeader
+		PE_GetNTHeader
+		PE_IsConsole
+		PE_IsGUI
+		PE_HexDump
+		
