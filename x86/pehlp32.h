@@ -45,7 +45,7 @@
 
 #include <windows.h>
 
-#define     T_EXE       0x00000010
+#define     T_PE        0x00000010
 #define     T_OTHER     0x00000050
 
 typedef struct
