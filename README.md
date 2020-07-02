@@ -9,7 +9,7 @@ Original code "imported" with small changes from PEDump utility,
 http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
 
 I've organized bits and pieces from the original PEDump code in this DLL as part
-of a university lab project (a task manager). Thanks to Matt for all his work in
+of a university lab project (a task manager). Thanks to Matt for all of his work in
 bringing the MS Windows guts to more light. Please note that this is cca. 20 years
 old code. I digged it from the bowels of my drive and spiff it a little bit to 
 compile with Pelles's C compiler and to generate a 64 bit version as well. It was
