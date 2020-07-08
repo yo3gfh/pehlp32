@@ -16,7 +16,7 @@ compile with Pelles's C compiler and to generate a 64 bit version as well. It wa
 good fun, make what you want of it. I've included the archive with the PEDump code
 as well.
 	
-                             0 0 0
+-----
 								
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-                             0 0 0
+-----
 
 It's taylored to my own needs, modify it to suit your own. I'm not a professional programmer,
 so this isn't the best code you'll find on the web, you have been warned :-))
