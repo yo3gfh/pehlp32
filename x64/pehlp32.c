@@ -3,20 +3,20 @@
     ----------------------------------------------------------
     Copyright (c) 2020 Adrian Petrila, YO3GFH
     Original code "imported" with small changes from PEDump utility,
-    (c) 1994-2001 Matt Pietrek.
-    
-    http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
+	(c) 1994-2001 Matt Pietrek.
+	
+	http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
 
-    I've organized bits and pieces from the original PEDump code in this DLL as part
-    of a university lab project (a task manager). Thanks to Matt for all of his work in
-    bringing the MS Windows guts to more light. Please note that this is cca. 20 years
-    old code. I digged it from the bowels of my drive and spiff it a little bit to 
-    compile with Pelles's C compiler and to generate a 64 bit version as well. It was
-    good fun, make what you want of it. I've included the archive with the PEDump code
-    as well.
-    
-                                * * *
-                                
+	I've organized bits and pieces from the original PEDump code in this DLL as part
+	of a university lab project (a task manager). Thanks to Matt for all his work in
+	bringing the MS Windows guts to more light. Please note that this is cca. 20 years
+	old code. I digged it from the bowels of my drive and spiff it a little bit to 
+	compile with Pelles's C compiler and to generate a 64 bit version as well. It was
+	good fun, make what you want of it. I've included the archive with the PEDump code
+	as well.
+	
+								* * *
+								
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-                                * * *
+								* * *
 
     It's taylored to my own needs, modify it to suit your own. I'm not a professional programmer,
     so this isn't the best code you'll find on the web, you have been warned :-))
@@ -40,6 +40,14 @@
 
 #include <windows.h>
 #include "__pehlp32.h"
+
+#if defined(_AMD64_)
+    #define IMG_BASE UINT64
+#elif defined(_X86_)
+    #define IMG_BASE DWORD
+#else
+    #error "Please choose either _AMD64_ or _X86_ architecture"
+#endif
 
 static const            TCHAR      Alphabet[] = TEXT("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -54,19 +62,21 @@ static BOOL TimeToFileTime ( long time, FILETIME * pft );
 
 BOOL                    WINAPI PE_OpenModule             ( TCHAR * modname, MOD_BASE * mod, BOOL readonly );
 BOOL                    WINAPI PE_CloseModule            ( MOD_BASE * mod );
-LPVOID                  WINAPI PE_RVAToPtr               ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, DWORD imageBase );
 PIMAGE_SECTION_HEADER   WINAPI PE_GetSectionHeader       ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader );
 PIMAGE_SECTION_HEADER   WINAPI PE_FindSection            ( const TCHAR * name, PIMAGE_NT_HEADERS pNTHeader );
-BOOL                    WINAPI PE_EnumImports            ( DWORD base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, DWORD lParam );
-BOOL                    WINAPI PE_EnumExports            ( DWORD base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, DWORD lParam );
-BOOL                    WINAPI PE_EnumSections           ( DWORD base, ENUMSECTIONSPROC enumsections, DWORD lParam );
-BOOL                    WINAPI PE_EnumCharacteristics    ( DWORD base, ENUMFHATTRIBPROC enumattrib, DWORD lParam );
+
+LPVOID                  WINAPI PE_RVAToPtr               ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, IMG_BASE imageBase );
+BOOL                    WINAPI PE_EnumImports            ( IMG_BASE base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, DWORD lParam );
+BOOL                    WINAPI PE_EnumExports            ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, DWORD lParam );
+BOOL                    WINAPI PE_EnumSections           ( IMG_BASE base, ENUMSECTIONSPROC enumsections, DWORD lParam );
+BOOL                    WINAPI PE_EnumCharacteristics    ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, DWORD lParam );
+LPVOID                  WINAPI PE_GetFileHeader          ( IMG_BASE base );
+LPVOID                  WINAPI PE_GetOptionalHeader      ( IMG_BASE base );
+LPVOID                  WINAPI PE_GetNTHeader            ( IMG_BASE base );
+BOOL                    WINAPI PE_IsConsole              ( IMG_BASE base );
+BOOL                    WINAPI PE_IsGUI                  ( IMG_BASE base );
+
 BOOL                    WINAPI PE_GetMachineType         ( DWORD machine, TCHAR * szoutbuf );
-LPVOID                  WINAPI PE_GetFileHeader          ( DWORD base );
-LPVOID                  WINAPI PE_GetOptionalHeader      ( DWORD base );
-LPVOID                  WINAPI PE_GetNTHeader            ( DWORD base );
-BOOL                    WINAPI PE_IsConsole              ( DWORD base );
-BOOL                    WINAPI PE_IsGUI                  ( DWORD base );
 BOOL                    WINAPI PE_HexDump                ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, DWORD lParam );
 
 
@@ -170,8 +180,7 @@ BOOL WINAPI PE_CloseModule ( MOD_BASE * mod )
     return TRUE;
 }
 
-
-LPVOID WINAPI PE_RVAToPtr ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, DWORD imageBase )
+LPVOID WINAPI PE_RVAToPtr ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, IMG_BASE imageBase )
 /*****************************************************************************************************************/
 /* Convert a RVA (relative virtual address) into a usable pointer                                                */
 {    
@@ -198,8 +207,8 @@ PIMAGE_SECTION_HEADER WINAPI PE_GetSectionHeader ( DWORD rva, PIMAGE_NT_HEADERS 
     if ( pNTHeader == NULL ) { return 0; }
     if ( ( section = IMAGE_FIRST_SECTION ( pNTHeader ) ) == NULL ) { return 0; }
 
-    // in case you happen to open a module linked with Watcom tools :)
-    // whih sets Misc.VirtualSize to 0..
+	// in case you happen to open a module linked with Watcom tools :)
+	// whih sets Misc.VirtualSize to 0..
     for ( i = 0; i < pNTHeader->FileHeader.NumberOfSections; i++, section++ )
     {
         if ( section->Misc.VirtualSize == 0 )
@@ -213,7 +222,8 @@ PIMAGE_SECTION_HEADER WINAPI PE_GetSectionHeader ( DWORD rva, PIMAGE_NT_HEADERS 
     return 0;
 }
 
-BOOL WINAPI PE_EnumImports ( DWORD base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, DWORD lParam )
+
+BOOL WINAPI PE_EnumImports ( IMG_BASE base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, DWORD lParam )
 /*****************************************************************************************************************/
 /* Enum imported modules as well as the coresponding imported functions                                          */
 {
@@ -281,7 +291,7 @@ __try
 
         thunkIAT = ( PIMAGE_THUNK_DATA )PE_RVAToPtr ( ( DWORD )thunkIAT, pNTHeader, base );
     
-        // call the module user supplied callback function
+		// call the module user supplied callback function
         if ( enummod != NULL )
         {
             if ( enummod ( &ii, lParam ) == FALSE ) break;
@@ -306,7 +316,7 @@ __try
                 lstrcpy ( ii.fnname, pOrdinalName->Name );
             }
             
-            // call the functions enum user supplied callback function
+			// call the functions enum user supplied callback function
             if ( enumfns != NULL )
             {
                 if ( enumfns ( &ii, lParam ) == FALSE )
@@ -324,8 +334,7 @@ __try
     return result;
 }
 
-
-BOOL WINAPI PE_EnumExports ( DWORD base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, DWORD lParam )
+BOOL WINAPI PE_EnumExports ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, DWORD lParam )
 /*****************************************************************************************************************/
 /* If we have a DLL, enum exports                                                                                */
 {
@@ -354,7 +363,6 @@ __try
     exportsStartRVA = GetImgDirEntryRVA ( pNTHeader,IMAGE_DIRECTORY_ENTRY_EXPORT );
     exportsEndRVA   = exportsStartRVA + GetImgDirEntrySize ( pNTHeader, IMAGE_DIRECTORY_ENTRY_EXPORT );
 
-    // get a IMAGE_SECTION_HEADER pointer 
     header = PE_GetSectionHeader ( exportsStartRVA, pNTHeader );
     if ( !header ) { return FALSE; }
         
@@ -381,7 +389,7 @@ __try
         if ( getinfo ( &ei, lParam ) == FALSE ) { return TRUE; }
     }
 
-    // get pointers to function, ordinal and name tables
+	// get pointers to function, ordinal and name tables
     functions = ( PDWORD )PE_RVAToPtr ( exportDir->AddressOfFunctions, pNTHeader, base );
     ordinals = ( PWORD )PE_RVAToPtr ( exportDir->AddressOfNameOrdinals, pNTHeader, base );
     names = ( DWORD* )PE_RVAToPtr ( exportDir->AddressOfNames, pNTHeader, base );
@@ -403,14 +411,14 @@ __try
             if ( ordinals[j] == LOWORD(i) )
                 lstrcpy ( ei.fnname, PE_RVAToPtr ( names[j], pNTHeader, base ) );
 
-        // is it a forwarder? (from another DLL)
-        // then entrypoint is in .edata section, and is an RVA to the DllName.EntryPointName
+		// is it a forwarder? (from another DLL)
+		// then entrypoint is in .edata section, and is an RVA to the DllName.EntryPointName
         if ( ( entryPointRVA >= exportsStartRVA ) && ( entryPointRVA <= exportsEndRVA ) )
         {
             ei.forwarder = ( DWORD )PE_RVAToPtr ( entryPointRVA, pNTHeader, base);
         }        
 
-        // call user callback fun.
+		// call user callback fun.
         if ( enumfns != NULL )
         {
             if ( enumfns ( &ei, lParam ) == FALSE )
@@ -423,7 +431,7 @@ __try
     return result;
 }
 
-BOOL WINAPI PE_EnumSections ( DWORD base, ENUMSECTIONSPROC enumsections, DWORD lParam )
+BOOL WINAPI PE_EnumSections ( IMG_BASE base, ENUMSECTIONSPROC enumsections, DWORD lParam )
 /*****************************************************************************************************************/
 /* Enumerate sections                                                                                            */
 {
@@ -492,7 +500,7 @@ PIMAGE_SECTION_HEADER WINAPI PE_FindSection ( const TCHAR * name, PIMAGE_NT_HEAD
     return NULL;
 }
 
-BOOL WINAPI PE_EnumCharacteristics ( DWORD base, ENUMFHATTRIBPROC enumattrib, DWORD lParam )
+BOOL WINAPI PE_EnumCharacteristics ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, DWORD lParam )
 /*****************************************************************************************************************/
 /* Enum module characteristics                                                                                   */
 {
@@ -523,7 +531,7 @@ __try
     return result;
 }
 
-LPVOID WINAPI PE_GetFileHeader ( DWORD base )
+LPVOID WINAPI PE_GetFileHeader ( IMG_BASE base )
 /*****************************************************************************************************************/
 /* Get a pointer to IMAGE_FILE_HEADER                                                                            */
 {
@@ -538,7 +546,7 @@ LPVOID WINAPI PE_GetFileHeader ( DWORD base )
     return ( LPVOID )( ( PIMAGE_FILE_HEADER )&pNTHeader->FileHeader );
 }
 
-LPVOID WINAPI PE_GetOptionalHeader ( DWORD base )
+LPVOID WINAPI PE_GetOptionalHeader ( IMG_BASE base )
 /*****************************************************************************************************************/
 /* Get a pointer to IMAGE_OPTIONAL_HEADER                                                                        */
 {
@@ -553,7 +561,7 @@ LPVOID WINAPI PE_GetOptionalHeader ( DWORD base )
     return ( LPVOID )( ( PIMAGE_OPTIONAL_HEADER )&pNTHeader->OptionalHeader );
 }
 
-LPVOID WINAPI PE_GetNTHeader ( DWORD base )
+LPVOID WINAPI PE_GetNTHeader ( IMG_BASE base )
 /*****************************************************************************************************************/
 /* Get a pointer to PIMAGE_NT_HEADERS                                                                            */
 {
@@ -568,7 +576,7 @@ LPVOID WINAPI PE_GetNTHeader ( DWORD base )
     return ( LPVOID )pNTHeader;
 }
 
-BOOL  WINAPI PE_IsConsole ( DWORD base )
+BOOL  WINAPI PE_IsConsole ( IMG_BASE base )
 /*****************************************************************************************************************/
 /* Do we a have a console app?                                                                                   */
 {
@@ -585,7 +593,7 @@ BOOL  WINAPI PE_IsConsole ( DWORD base )
     return ( ( pOptHeader->Subsystem ) == IMAGE_SUBSYSTEM_WINDOWS_CUI );
 }
 
-BOOL  WINAPI PE_IsGUI ( DWORD base )
+BOOL  WINAPI PE_IsGUI ( IMG_BASE base )
 /*****************************************************************************************************************/
 /* Do we have a GUI app?                                                                                         */
 {
