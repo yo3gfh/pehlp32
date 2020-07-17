@@ -41,14 +41,6 @@
 #include <windows.h>
 #include "__pehlp32.h"
 
-#if defined(_AMD64_)
-    #define IMG_BASE UINT64
-#elif defined(_X86_)
-    #define IMG_BASE DWORD
-#else
-    #error "Please choose either _AMD64_ or _X86_ architecture"
-#endif
-
 static const            TCHAR      Alphabet[] = TEXT("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
 static                  DWORD      undiv                    ( DWORD val, DWORD * quot );
@@ -66,10 +58,10 @@ PIMAGE_SECTION_HEADER   WINAPI PE_GetSectionHeader       ( DWORD rva, PIMAGE_NT_
 PIMAGE_SECTION_HEADER   WINAPI PE_FindSection            ( const TCHAR * name, PIMAGE_NT_HEADERS pNTHeader );
 
 LPVOID                  WINAPI PE_RVAToPtr               ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, IMG_BASE imageBase );
-BOOL                    WINAPI PE_EnumImports            ( IMG_BASE base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, DWORD lParam );
-BOOL                    WINAPI PE_EnumExports            ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, DWORD lParam );
-BOOL                    WINAPI PE_EnumSections           ( IMG_BASE base, ENUMSECTIONSPROC enumsections, DWORD lParam );
-BOOL                    WINAPI PE_EnumCharacteristics    ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, DWORD lParam );
+BOOL                    WINAPI PE_EnumImports            ( IMG_BASE base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, EN_LPARAM lParam );
+BOOL                    WINAPI PE_EnumExports            ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, EN_LPARAM lParam );
+BOOL                    WINAPI PE_EnumSections           ( IMG_BASE base, ENUMSECTIONSPROC enumsections, EN_LPARAM lParam );
+BOOL                    WINAPI PE_EnumCharacteristics    ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, EN_LPARAM lParam );
 LPVOID                  WINAPI PE_GetFileHeader          ( IMG_BASE base );
 LPVOID                  WINAPI PE_GetOptionalHeader      ( IMG_BASE base );
 LPVOID                  WINAPI PE_GetNTHeader            ( IMG_BASE base );
@@ -77,7 +69,7 @@ BOOL                    WINAPI PE_IsConsole              ( IMG_BASE base );
 BOOL                    WINAPI PE_IsGUI                  ( IMG_BASE base );
 
 BOOL                    WINAPI PE_GetMachineType         ( DWORD machine, TCHAR * szoutbuf );
-BOOL                    WINAPI PE_HexDump                ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, DWORD lParam );
+BOOL                    WINAPI PE_HexDump                ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, EN_LPARAM lParam );
 
 
 // DLL entrypoint
@@ -222,8 +214,7 @@ PIMAGE_SECTION_HEADER WINAPI PE_GetSectionHeader ( DWORD rva, PIMAGE_NT_HEADERS 
     return 0;
 }
 
-
-BOOL WINAPI PE_EnumImports ( IMG_BASE base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, DWORD lParam )
+BOOL WINAPI PE_EnumImports ( IMG_BASE base, ENUMIMPORTMODPROC enummod, ENUMIMPORTFNSPROC enumfns, EN_LPARAM lParam )
 /*****************************************************************************************************************/
 /* Enum imported modules as well as the coresponding imported functions                                          */
 {
@@ -286,7 +277,7 @@ __try
         }
         
         // get pointer to import table 
-        thunk = ( PIMAGE_THUNK_DATA )PE_RVAToPtr ( ( DWORD )thunk, pNTHeader, ( DWORD )base );
+        thunk = ( PIMAGE_THUNK_DATA )PE_RVAToPtr ( ( DWORD )thunk, pNTHeader, base );
         if ( !thunk ) { return FALSE; }
 
         thunkIAT = ( PIMAGE_THUNK_DATA )PE_RVAToPtr ( ( DWORD )thunkIAT, pNTHeader, base );
@@ -334,7 +325,7 @@ __try
     return result;
 }
 
-BOOL WINAPI PE_EnumExports ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, DWORD lParam )
+BOOL WINAPI PE_EnumExports ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, EN_LPARAM lParam )
 /*****************************************************************************************************************/
 /* If we have a DLL, enum exports                                                                                */
 {
@@ -431,7 +422,7 @@ __try
     return result;
 }
 
-BOOL WINAPI PE_EnumSections ( IMG_BASE base, ENUMSECTIONSPROC enumsections, DWORD lParam )
+BOOL WINAPI PE_EnumSections ( IMG_BASE base, ENUMSECTIONSPROC enumsections, EN_LPARAM lParam )
 /*****************************************************************************************************************/
 /* Enumerate sections                                                                                            */
 {
@@ -500,7 +491,7 @@ PIMAGE_SECTION_HEADER WINAPI PE_FindSection ( const TCHAR * name, PIMAGE_NT_HEAD
     return NULL;
 }
 
-BOOL WINAPI PE_EnumCharacteristics ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, DWORD lParam )
+BOOL WINAPI PE_EnumCharacteristics ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, EN_LPARAM lParam )
 /*****************************************************************************************************************/
 /* Enum module characteristics                                                                                   */
 {
@@ -665,15 +656,15 @@ BOOL WINAPI PE_GetMachineType ( DWORD machine, TCHAR * szoutbuf )
     return result;
 }
 
-BOOL WINAPI PE_HexDump ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, DWORD lParam )
+BOOL WINAPI PE_HexDump ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, EN_LPARAM lParam )
 /*****************************************************************************************************************/
 /* HEX dump dwsrclen bytes from src, calling hexdumpproc every time we have HEX_DUMP_WIDTH bytes prepared        */
 {
-    TCHAR   buffer[512];
-    TCHAR   * buffPtr, * buffPtr2;
-    DWORD   cOutput, i, rightlimit, bytesToGo;
-    BYTE    value;
-    char    * ptmp;
+    TCHAR       buffer[512];
+    TCHAR       * buffPtr, * buffPtr2;
+    DWORD       cOutput, i, rightlimit, bytesToGo;
+    BYTE        value;
+    char        * ptmp;
 
     if ( ( src == NULL ) || ( dwsrclen == 0 ) || ( hexdumpproc == NULL ) ) { return FALSE; }
 

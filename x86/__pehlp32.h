@@ -40,6 +40,15 @@
 
 #include <windows.h>
 
+#if defined(_AMD64_)
+    #define IMG_BASE UINT64
+    #define EN_LPARAM UINT64
+#elif defined(_X86_)
+    #define IMG_BASE DWORD
+    #define EN_LPARAM DWORD
+#else
+    #error "Please choose either _AMD64_ or _X86_ architecture"
+#endif
 
 #define MakePtr( cast, ptr, addValue ) (cast)( (DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
 
@@ -162,13 +171,13 @@ WORD_FLAG_DESCRIPTIONS ImageFileHeaderCharacteristics[] =
 #define NUMBER_IMAGE_HEADER_FLAGS \
     (sizeof(ImageFileHeaderCharacteristics) / sizeof(WORD_FLAG_DESCRIPTIONS))
 
-typedef BOOL ( CALLBACK * ENUMIMPORTMODPROC ) ( IMPORT_INFO *, DWORD );
-typedef BOOL ( CALLBACK * ENUMIMPORTFNSPROC ) ( IMPORT_INFO *, DWORD );
+typedef BOOL ( CALLBACK * ENUMIMPORTMODPROC ) ( IMPORT_INFO *, EN_LPARAM );
+typedef BOOL ( CALLBACK * ENUMIMPORTFNSPROC ) ( IMPORT_INFO *, EN_LPARAM );
 
-typedef BOOL ( CALLBACK * GETEXPORTINFOPROC ) ( EXPORT_INFO *, DWORD );
-typedef BOOL ( CALLBACK * ENUMEXPORTFNSPROC ) ( EXPORT_INFO *, DWORD );
+typedef BOOL ( CALLBACK * GETEXPORTINFOPROC ) ( EXPORT_INFO *, EN_LPARAM );
+typedef BOOL ( CALLBACK * ENUMEXPORTFNSPROC ) ( EXPORT_INFO *, EN_LPARAM );
 
-typedef BOOL ( CALLBACK * ENUMSECTIONSPROC ) ( SECTION_INFO *, DWORD );
-typedef BOOL ( CALLBACK * ENUMFHATTRIBPROC ) ( TCHAR *, DWORD );
+typedef BOOL ( CALLBACK * ENUMSECTIONSPROC ) ( SECTION_INFO *, EN_LPARAM );
+typedef BOOL ( CALLBACK * ENUMFHATTRIBPROC ) ( TCHAR *, EN_LPARAM );
 
-typedef BOOL ( CALLBACK * HEXDUMPPROC ) ( TCHAR *, DWORD );
+typedef BOOL ( CALLBACK * HEXDUMPPROC ) ( TCHAR *, EN_LPARAM );
