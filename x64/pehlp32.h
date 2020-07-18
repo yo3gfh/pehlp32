@@ -45,6 +45,13 @@
 
 #include <windows.h>
 
+/*  
+    This is mostly for Win10 x64, where we can't seem to get away with 32bit values in the low DWORD of
+    a 64 bit pointer anymore. MapViewOfFile WILL return a true 64bit pointer on Win10 x64, unlike on Win7 x64.
+	At least, this is my observation :-)
+    Could use the LPARAM or LONG_PTR type, but just defined these, to make sure.
+*/
+
 #if defined(_AMD64_)
     #define IMG_BASE UINT64
     #define EN_LPARAM UINT64

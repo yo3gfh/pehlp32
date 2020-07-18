@@ -6,7 +6,7 @@ Copyright (c) 2020 Adrian Petrila, YO3GFH<br>
 Original code "imported" with small changes from PEDump utility,
 (c) 1994-2001 Matt Pietrek.
 
-http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
+<http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm/>
 
 I've organized bits and pieces from the original PEDump code in this DLL as part
 of a university lab project (a task manager). Thanks to Matt for all of his work in

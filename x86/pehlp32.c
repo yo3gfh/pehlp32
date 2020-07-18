@@ -3,20 +3,20 @@
     ----------------------------------------------------------
     Copyright (c) 2020 Adrian Petrila, YO3GFH
     Original code "imported" with small changes from PEDump utility,
-	(c) 1994-2001 Matt Pietrek.
-	
-	http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
+    (c) 1994-2001 Matt Pietrek.
+    
+    http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
 
-	I've organized bits and pieces from the original PEDump code in this DLL as part
-	of a university lab project (a task manager). Thanks to Matt for all his work in
-	bringing the MS Windows guts to more light. Please note that this is cca. 20 years
-	old code. I digged it from the bowels of my drive and spiff it a little bit to 
-	compile with Pelles's C compiler and to generate a 64 bit version as well. It was
-	good fun, make what you want of it. I've included the archive with the PEDump code
-	as well.
-	
-								* * *
-								
+    I've organized bits and pieces from the original PEDump code in this DLL as part
+    of a university lab project (a task manager). Thanks to Matt for all his work in
+    bringing the MS Windows guts to more light. Please note that this is cca. 20 years
+    old code. I digged it from the bowels of my drive and spiff it a little bit to 
+    compile with Pelles's C compiler and to generate a 64 bit version as well. It was
+    good fun, make what you want of it. I've included the archive with the PEDump code
+    as well.
+    
+                                * * *
+                                
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +30,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-								* * *
+                                * * *
 
     It's taylored to my own needs, modify it to suit your own. I'm not a professional programmer,
     so this isn't the best code you'll find on the web, you have been warned :-))
@@ -199,8 +199,8 @@ PIMAGE_SECTION_HEADER WINAPI PE_GetSectionHeader ( DWORD rva, PIMAGE_NT_HEADERS 
     if ( pNTHeader == NULL ) { return 0; }
     if ( ( section = IMAGE_FIRST_SECTION ( pNTHeader ) ) == NULL ) { return 0; }
 
-	// in case you happen to open a module linked with Watcom tools :)
-	// whih sets Misc.VirtualSize to 0..
+    // in case you happen to open a module linked with Watcom tools :)
+    // whih sets Misc.VirtualSize to 0..
     for ( i = 0; i < pNTHeader->FileHeader.NumberOfSections; i++, section++ )
     {
         if ( section->Misc.VirtualSize == 0 )
@@ -282,7 +282,7 @@ __try
 
         thunkIAT = ( PIMAGE_THUNK_DATA )PE_RVAToPtr ( ( DWORD )thunkIAT, pNTHeader, base );
     
-		// call the module user supplied callback function
+        // call the module user supplied callback function
         if ( enummod != NULL )
         {
             if ( enummod ( &ii, lParam ) == FALSE ) break;
@@ -307,7 +307,7 @@ __try
                 lstrcpy ( ii.fnname, pOrdinalName->Name );
             }
             
-			// call the functions enum user supplied callback function
+            // call the functions enum user supplied callback function
             if ( enumfns != NULL )
             {
                 if ( enumfns ( &ii, lParam ) == FALSE )
@@ -380,7 +380,7 @@ __try
         if ( getinfo ( &ei, lParam ) == FALSE ) { return TRUE; }
     }
 
-	// get pointers to function, ordinal and name tables
+    // get pointers to function, ordinal and name tables
     functions = ( PDWORD )PE_RVAToPtr ( exportDir->AddressOfFunctions, pNTHeader, base );
     ordinals = ( PWORD )PE_RVAToPtr ( exportDir->AddressOfNameOrdinals, pNTHeader, base );
     names = ( DWORD* )PE_RVAToPtr ( exportDir->AddressOfNames, pNTHeader, base );
@@ -402,14 +402,14 @@ __try
             if ( ordinals[j] == LOWORD(i) )
                 lstrcpy ( ei.fnname, PE_RVAToPtr ( names[j], pNTHeader, base ) );
 
-		// is it a forwarder? (from another DLL)
-		// then entrypoint is in .edata section, and is an RVA to the DllName.EntryPointName
+        // is it a forwarder? (from another DLL)
+        // then entrypoint is in .edata section, and is an RVA to the DllName.EntryPointName
         if ( ( entryPointRVA >= exportsStartRVA ) && ( entryPointRVA <= exportsEndRVA ) )
         {
             ei.forwarder = ( DWORD )PE_RVAToPtr ( entryPointRVA, pNTHeader, base);
         }        
 
-		// call user callback fun.
+        // call user callback fun.
         if ( enumfns != NULL )
         {
             if ( enumfns ( &ei, lParam ) == FALSE )
