@@ -1,0 +1,6 @@
+output
+*.exe
+*.obj
+*.res
+*.ppx
+*.tag
