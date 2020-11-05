@@ -5,15 +5,15 @@
     Original code "imported" with small changes from PEDump utility,
     (c) 1994-2001 Matt Pietrek.
     
-    http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
+http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
 
-    I've organized bits and pieces from the original PEDump code in this DLL as part
-    of a university lab project (a task manager). Thanks to Matt for all his work in
-    bringing the MS Windows guts to more light. Please note that this is cca. 20 years
-    old code. I digged it from the bowels of my drive and spiff it a little bit to 
-    compile with Pelles's C compiler and to generate a 64 bit version as well. It was
-    good fun, make what you want of it. I've included the archive with the PEDump code
-    as well.
+    I've organized bits and pieces from the original PEDump code in this DLL 
+    as part of a university lab project (a task manager). Thanks to Matt for 
+    all his work in bringing the MS Windows guts to more light. Please note 
+    that this is cca. 20 years old code. I digged it from the bowels of my 
+    drive and spiff it a little bit to compile with Pelles's C compiler and 
+    to generate a 64 bit version as well. It was good fun, make what you want 
+    of it. I've included the archive with the PEDump code as well.
     
                                 * * *
                                 
@@ -32,8 +32,9 @@
 
                                 * * *
 
-    It's taylored to my own needs, modify it to suit your own. I'm not a professional programmer,
-    so this isn't the best code you'll find on the web, you have been warned :-))
+    It's taylored to my own needs, modify it to suit your own. I'm not a 
+    professional programmer, so this isn't the best code you'll find on the 
+    web, you have been warned :-))
 
     All the bugs are guaranteed to be genuine, and are exclusively mine =)
 */
@@ -43,7 +44,8 @@
 #define IMG_BASE ULONG_PTR
 #define EN_LPARAM LPARAM
 
-#define MakePtr( cast, ptr, addValue ) (cast)( (DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
+#define MakePtr( cast, ptr, addValue ) \
+    (cast)( (DWORD_PTR)(ptr) + (DWORD_PTR)(addValue))
 
 #define GetImgDirEntryRVA( pNTHdr, IDE ) \
     (pNTHdr->OptionalHeader.DataDirectory[IDE].VirtualAddress)
@@ -144,21 +146,21 @@ DWORD_FLAG_DESCRIPTIONS SectionCharacteristics[] =
 
 WORD_FLAG_DESCRIPTIONS ImageFileHeaderCharacteristics[] = 
 {
-{ IMAGE_FILE_RELOCS_STRIPPED,           TEXT("RELOCS_STRIPPED") },
-{ IMAGE_FILE_EXECUTABLE_IMAGE,          TEXT("EXECUTABLE_IMAGE") },
-{ IMAGE_FILE_LINE_NUMS_STRIPPED,        TEXT("LINE_NUMS_STRIPPED") },
-{ IMAGE_FILE_LOCAL_SYMS_STRIPPED,       TEXT("LOCAL_SYMS_STRIPPED") },
-{ IMAGE_FILE_AGGRESIVE_WS_TRIM,         TEXT("AGGRESIVE_WS_TRIM") },
-{ IMAGE_FILE_LARGE_ADDRESS_AWARE,       TEXT("IMAGE_FILE_LARGE_ADDRESS_AWARE") },
-{ IMAGE_FILE_BYTES_REVERSED_LO,         TEXT("BYTES_REVERSED_LO") },
-{ IMAGE_FILE_32BIT_MACHINE,             TEXT("32BIT_MACHINE") },
-{ IMAGE_FILE_DEBUG_STRIPPED,            TEXT("DEBUG_STRIPPED") },
-{ IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP,   TEXT("REMOVABLE_RUN_FROM_SWAP") },
-{ IMAGE_FILE_NET_RUN_FROM_SWAP,         TEXT("NET_RUN_FROM_SWAP") },
-{ IMAGE_FILE_SYSTEM,                    TEXT("SYSTEM") },
-{ IMAGE_FILE_DLL,                       TEXT("DLL") },
-{ IMAGE_FILE_UP_SYSTEM_ONLY,            TEXT("UP_SYSTEM_ONLY") },
-{ IMAGE_FILE_BYTES_REVERSED_HI,         TEXT("BYTES_REVERSED_HI") }
+{ IMAGE_FILE_RELOCS_STRIPPED,         TEXT("RELOCS_STRIPPED") },
+{ IMAGE_FILE_EXECUTABLE_IMAGE,        TEXT("EXECUTABLE_IMAGE") },
+{ IMAGE_FILE_LINE_NUMS_STRIPPED,      TEXT("LINE_NUMS_STRIPPED") },
+{ IMAGE_FILE_LOCAL_SYMS_STRIPPED,     TEXT("LOCAL_SYMS_STRIPPED") },
+{ IMAGE_FILE_AGGRESIVE_WS_TRIM,       TEXT("AGGRESIVE_WS_TRIM") },
+{ IMAGE_FILE_LARGE_ADDRESS_AWARE,     TEXT("IMAGE_FILE_LARGE_ADDRESS_AWARE") },
+{ IMAGE_FILE_BYTES_REVERSED_LO,       TEXT("BYTES_REVERSED_LO") },
+{ IMAGE_FILE_32BIT_MACHINE,           TEXT("32BIT_MACHINE") },
+{ IMAGE_FILE_DEBUG_STRIPPED,          TEXT("DEBUG_STRIPPED") },
+{ IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP, TEXT("REMOVABLE_RUN_FROM_SWAP") },
+{ IMAGE_FILE_NET_RUN_FROM_SWAP,       TEXT("NET_RUN_FROM_SWAP") },
+{ IMAGE_FILE_SYSTEM,                  TEXT("SYSTEM") },
+{ IMAGE_FILE_DLL,                     TEXT("DLL") },
+{ IMAGE_FILE_UP_SYSTEM_ONLY,          TEXT("UP_SYSTEM_ONLY") },
+{ IMAGE_FILE_BYTES_REVERSED_HI,       TEXT("BYTES_REVERSED_HI") }
 };
 
 #define NUMBER_IMAGE_HEADER_FLAGS \

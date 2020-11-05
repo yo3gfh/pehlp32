@@ -1,19 +1,19 @@
 /*
-    PEHLP32, PE (portable executable) helper library v. 1.1
+    PEHLP32, a PE (portable executable) helper library v. 1.1
     ----------------------------------------------------------
     Copyright (c) 2020 Adrian Petrila, YO3GFH
     Original code "imported" with small changes from PEDump utility,
-    (c) 1998-2001 Matt Pietrek.
+    (c) 1994-2001 Matt Pietrek.
     
-    http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
+http://bytepointer.com/resources/pietrek_in_depth_look_into_pe_format_pt1.htm
 
-    I've organized bits and pieces from the original PEDump code in this DLL as part
-    of a university lab project (a task manager). Thanks to Matt for all his work in
-    bringing the MS Windows guts to more light. Please note that this is cca. 20 years
-    old code. I digged it from the bowels of my drive and spiff it a little bit to 
-    compile with Pelles's C compiler and to generate a 64 bit version as well. It was
-    good fun, make what you want of it. I've included the archive with the PEDump code
-    as well.
+    I've organized bits and pieces from the original PEDump code in this DLL 
+    as part of a university lab project (a task manager). Thanks to Matt for 
+    all his work in bringing the MS Windows guts to more light. Please note 
+    that this is cca. 20 years old code. I digged it from the bowels of my 
+    drive and spiff it a little bit to compile with Pelles's C compiler and 
+    to generate a 64 bit version as well. It was good fun, make what you want 
+    of it. I've included the archive with the PEDump code as well.
     
                                 * * *
                                 
@@ -32,8 +32,9 @@
 
                                 * * *
 
-    It's taylored to my own needs, modify it to suit your own. I'm not a professional programmer,
-    so this isn't the best code you'll find on the web, you have been warned :-))
+    It's taylored to my own needs, modify it to suit your own. I'm not a 
+    professional programmer, so this isn't the best code you'll find on the 
+    web, you have been warned :-))
 
     All the bugs are guaranteed to be genuine, and are exclusively mine =)
 */
@@ -119,22 +120,41 @@ typedef BOOL ( CALLBACK * ENUMSECTIONSPROC )    ( SECTION_INFO *, EN_LPARAM );
 typedef BOOL ( CALLBACK * ENUMFHATTRIBPROC )    ( TCHAR *, EN_LPARAM );
 typedef BOOL ( CALLBACK * HEXDUMPPROC )         ( TCHAR *, EN_LPARAM );
 
-BOOL                    WINAPI PE_OpenModule            ( TCHAR * modname, MOD_BASE * mod, BOOL readonly );
-BOOL                    WINAPI PE_CloseModule           ( MOD_BASE * mod );
-LPVOID                  WINAPI PE_RVAToPtr              ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, IMG_BASE imageBase );
-PIMAGE_SECTION_HEADER   WINAPI PE_GetSectionHeader      ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader );
-PIMAGE_SECTION_HEADER   WINAPI PE_FindSection           ( const TCHAR * name, PIMAGE_NT_HEADERS pNTHeader );
-BOOL                    WINAPI PE_EnumImports           ( IMG_BASE base,ENUMIMPORTMODPROC enummod,ENUMIMPORTFNSPROC enumfns, EN_LPARAM lParam );
-BOOL                    WINAPI PE_EnumExports           ( IMG_BASE base, GETEXPORTINFOPROC getinfo, ENUMEXPORTFNSPROC enumfns, EN_LPARAM lParam );
-BOOL                    WINAPI PE_EnumSections          ( IMG_BASE base, ENUMSECTIONSPROC enumsections, EN_LPARAM lParam );
-BOOL                    WINAPI PE_EnumCharacteristics   ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, EN_LPARAM lParam );
-BOOL                    WINAPI PE_GetMachineType        ( DWORD machine, TCHAR * szoutbuf );
+BOOL WINAPI PE_OpenModule ( TCHAR * modname, MOD_BASE * mod, BOOL readonly );
+BOOL WINAPI PE_CloseModule ( MOD_BASE * mod );
+
+LPVOID WINAPI PE_RVAToPtr ( DWORD rva, PIMAGE_NT_HEADERS pNTHeader, 
+    IMG_BASE imageBase );
+
+PIMAGE_SECTION_HEADER WINAPI PE_GetSectionHeader ( DWORD rva, 
+    PIMAGE_NT_HEADERS pNTHeader );
+
+PIMAGE_SECTION_HEADER WINAPI PE_FindSection ( const TCHAR * name, 
+    PIMAGE_NT_HEADERS pNTHeader );
+
+BOOL WINAPI PE_EnumImports ( IMG_BASE base,ENUMIMPORTMODPROC enummod,
+    ENUMIMPORTFNSPROC enumfns, EN_LPARAM lParam );
+
+BOOL WINAPI PE_EnumExports ( IMG_BASE base, GETEXPORTINFOPROC getinfo, 
+    ENUMEXPORTFNSPROC enumfns, EN_LPARAM lParam );
+
+BOOL WINAPI PE_EnumSections ( IMG_BASE base, ENUMSECTIONSPROC enumsections, 
+    EN_LPARAM lParam );
+
+BOOL WINAPI PE_EnumCharacteristics ( IMG_BASE base, ENUMFHATTRIBPROC enumattrib, 
+    EN_LPARAM lParam );
+
+BOOL WINAPI PE_GetMachineType ( DWORD machine, TCHAR * szoutbuf, 
+    size_t cchMax );
+
 LPVOID                  WINAPI PE_GetFileHeader         ( IMG_BASE base );
 LPVOID                  WINAPI PE_GetOptionalHeader     ( IMG_BASE base );
 LPVOID                  WINAPI PE_GetNTHeader           ( IMG_BASE base );
 BOOL                    WINAPI PE_IsConsole             ( IMG_BASE base );
 BOOL                    WINAPI PE_IsGUI                 ( IMG_BASE base );
-BOOL                    WINAPI PE_HexDump               ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, EN_LPARAM lParam );
+
+BOOL WINAPI PE_HexDump ( void * src, DWORD dwsrclen, HEXDUMPPROC hexdumpproc, 
+    EN_LPARAM lParam );
 
 
 #ifdef  __cplusplus
