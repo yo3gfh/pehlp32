@@ -12,10 +12,10 @@
 	</category>
 	<category name="__pehlp32.h">
 		<category name="Window">
-			<property name="Left" type="integer">25</property>
-			<property name="Top" type="integer">25</property>
-			<property name="Right" type="integer">1465</property>
-			<property name="Bottom" type="integer">597</property>
+			<property name="Left" type="integer">50</property>
+			<property name="Top" type="integer">50</property>
+			<property name="Right" type="integer">1490</property>
+			<property name="Bottom" type="integer">622</property>
 			<property name="Maximized" type="integer">0</property>
 			<property name="Active" type="integer">0</property>
 		</category>

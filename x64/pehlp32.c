@@ -1,7 +1,7 @@
 /*
     PEHLP32, a PE (portable executable) helper library v. 1.1
     ----------------------------------------------------------
-    Copyright (c) 2020 Adrian Petrila, YO3GFH
+    Copyright (c) 2002-2020 Adrian Petrila, YO3GFH
     Original code "imported" with small changes from PEDump utility,
     (c) 1994-2001 Matt Pietrek.
     
@@ -348,7 +348,8 @@ BOOL WINAPI PE_EnumImports ( IMG_BASE base, ENUMIMPORTMODPROC enummod,
     __try
     {
         dosHeader = ( PIMAGE_DOS_HEADER )base;
-        pNTHeader = MakePtr ( PIMAGE_NT_HEADERS, dosHeader, dosHeader->e_lfanew );
+        pNTHeader = MakePtr ( PIMAGE_NT_HEADERS, dosHeader, 
+            dosHeader->e_lfanew );
 
         importsStartRVA = GetImgDirEntryRVA ( pNTHeader, 
             IMAGE_DIRECTORY_ENTRY_IMPORT );
@@ -369,8 +370,9 @@ BOOL WINAPI PE_EnumImports ( IMG_BASE base, ENUMIMPORTMODPROC enummod,
 
         while ( TRUE )
         {
-            if ( ( importDesc->TimeDateStamp == 0 ) && ( importDesc->Name == 0 ) )
-                break;
+            if ( ( importDesc->TimeDateStamp == 0 ) && 
+                ( importDesc->Name == 0 ) )
+                    break;
 
             StringCchCopy ( ii.name, ARRAYSIZE(ii.name), PE_RVAToPtr 
                 ( importDesc->Name, pNTHeader, base ));
@@ -428,7 +430,8 @@ BOOL WINAPI PE_EnumImports ( IMG_BASE base, ENUMIMPORTMODPROC enummod,
                 if ( thunk->u1.Ordinal & IMAGE_ORDINAL_FLAG )
                 {
                     ii.ordinal = IMAGE_ORDINAL ( thunk->u1.Ordinal );
-                    StringCchCopy ( ii.fnname, ARRAYSIZE(ii.fnname), TEXT("N/A"));
+                    StringCchCopy ( ii.fnname, ARRAYSIZE(ii.fnname), 
+                        TEXT("N/A"));
                 }
                 else
                 {
@@ -506,7 +509,8 @@ BOOL WINAPI PE_EnumExports ( IMG_BASE base, GETEXPORTINFOPROC getinfo,
     __try
     {   
         dosHeader = ( PIMAGE_DOS_HEADER )base;
-        pNTHeader = MakePtr ( PIMAGE_NT_HEADERS, dosHeader, dosHeader->e_lfanew );
+        pNTHeader = MakePtr ( PIMAGE_NT_HEADERS, dosHeader, 
+            dosHeader->e_lfanew );
 
         exportsStartRVA = GetImgDirEntryRVA
             ( pNTHeader,IMAGE_DIRECTORY_ENTRY_EXPORT );
@@ -631,7 +635,8 @@ BOOL WINAPI PE_EnumSections ( IMG_BASE base,
     __try
     {
         dosHeader = ( PIMAGE_DOS_HEADER ) base;
-        pNTHeader = MakePtr ( PIMAGE_NT_HEADERS, dosHeader, dosHeader->e_lfanew );
+        pNTHeader = MakePtr ( PIMAGE_NT_HEADERS, dosHeader, 
+            dosHeader->e_lfanew );
         section   = IMAGE_FIRST_SECTION ( pNTHeader );
         csections = pNTHeader->FileHeader.NumberOfSections;
 
@@ -649,7 +654,7 @@ BOOL WINAPI PE_EnumSections ( IMG_BASE base,
 
             for ( j = 0; j < NUMBER_SECTION_CHARACTERISTICS; j++ )
             {
-                if ( section->Characteristics & SectionCharacteristics[j].flag )
+                if (section->Characteristics & SectionCharacteristics[j].flag)
                 {
                     StringCchCopy ( si.szchars[k], ARRAYSIZE(si.szchars[0]), 
                         SectionCharacteristics[j].name );
