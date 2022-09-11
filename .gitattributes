@@ -1,0 +1,9 @@
+*.c diff
+*.h diff
+*.rc diff
+*.md diff
+*.cpp diff
+*.hpp diff
+*.def diff
+*.txt diff
+*.manifest
